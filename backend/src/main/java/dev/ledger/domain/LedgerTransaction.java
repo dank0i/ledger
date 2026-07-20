@@ -31,6 +31,9 @@ public class LedgerTransaction {
     @Column(name = "idempotency_key", unique = true)
     private String idempotencyKey;
 
+    @Column(length = 50)
+    private String category;
+
     @OneToMany(mappedBy = "transaction", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("id")
     private List<TransactionLeg> legs = new ArrayList<>();
@@ -39,10 +42,11 @@ public class LedgerTransaction {
         // for JPA
     }
 
-    public LedgerTransaction(String description, Instant occurredAt, String idempotencyKey) {
+    public LedgerTransaction(String description, Instant occurredAt, String idempotencyKey, String category) {
         this.description = description;
         this.occurredAt = occurredAt;
         this.idempotencyKey = idempotencyKey;
+        this.category = category;
     }
 
     public void addLeg(Account account, TransactionLeg.Direction direction, java.math.BigDecimal amount) {
@@ -63,6 +67,10 @@ public class LedgerTransaction {
 
     public String getIdempotencyKey() {
         return idempotencyKey;
+    }
+
+    public String getCategory() {
+        return category;
     }
 
     public List<TransactionLeg> getLegs() {

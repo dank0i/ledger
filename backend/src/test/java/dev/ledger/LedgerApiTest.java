@@ -71,6 +71,22 @@ class LedgerApiTest {
     }
 
     @Test
+    void postedTransactionCarriesItsCategory() throws Exception {
+        long checking = createAccount("Checking", "ASSET");
+        long groceries = createAccount("Groceries", "EXPENSE");
+
+        mvc.perform(post("/api/transactions")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"description":"Weekly shop","category":"Food","legs":[
+                                  {"accountId":%d,"direction":"DEBIT","amount":"85.40"},
+                                  {"accountId":%d,"direction":"CREDIT","amount":"85.40"}]}
+                                """.formatted(groceries, checking)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.category").value("Food"));
+    }
+
+    @Test
     void idempotentReplayIsA200WithTheOriginalId() throws Exception {
         long checking = createAccount("Checking", "ASSET");
         long salary = createAccount("Salary", "INCOME");

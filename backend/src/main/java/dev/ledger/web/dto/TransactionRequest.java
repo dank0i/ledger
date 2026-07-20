@@ -14,9 +14,16 @@ import java.util.List;
 
 public record TransactionRequest(
         @NotBlank @Size(max = 255) String description,
+        @Size(max = 50) String category,
         Instant occurredAt,
         @Size(max = 255) String idempotencyKey,
         @NotNull @Valid List<LegRequest> legs) {
+
+    /** Convenience constructor for callers that do not set a category. */
+    public TransactionRequest(String description, Instant occurredAt, String idempotencyKey,
+                              List<LegRequest> legs) {
+        this(description, null, occurredAt, idempotencyKey, legs);
+    }
 
     public record LegRequest(
             @NotNull Long accountId,

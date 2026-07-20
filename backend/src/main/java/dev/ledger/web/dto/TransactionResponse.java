@@ -10,6 +10,7 @@ import java.util.List;
 public record TransactionResponse(
         Long id,
         String description,
+        String category,
         Instant occurredAt,
         String idempotencyKey,
         List<LegResponse> legs) {
@@ -23,7 +24,7 @@ public record TransactionResponse(
                 .map(l -> new LegResponse(l.getId(), l.getAccount().getId(), l.getAccount().getName(),
                         l.getDirection(), l.getAmount()))
                 .toList();
-        return new TransactionResponse(tx.getId(), tx.getDescription(), tx.getOccurredAt(),
-                tx.getIdempotencyKey(), legs);
+        return new TransactionResponse(tx.getId(), tx.getDescription(), tx.getCategory(),
+                tx.getOccurredAt(), tx.getIdempotencyKey(), legs);
     }
 }

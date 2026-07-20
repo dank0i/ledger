@@ -14,7 +14,7 @@ public record StatementResponse(
         BigDecimal closingBalance,
         List<Line> lines) {
 
-    public record Line(Instant occurredAt, String description,
+    public record Line(Instant occurredAt, String description, String category,
                        TransactionLeg.Direction direction, BigDecimal amount,
                        BigDecimal runningBalance) {
     }

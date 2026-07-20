@@ -88,7 +88,8 @@ public class LedgerService {
         }
 
         Instant occurredAt = request.occurredAt() != null ? request.occurredAt() : Instant.now();
-        LedgerTransaction tx = new LedgerTransaction(request.description(), occurredAt, request.idempotencyKey());
+        LedgerTransaction tx = new LedgerTransaction(request.description(), occurredAt,
+                request.idempotencyKey(), normalizeCategory(request.category()));
         for (TransactionRequest.LegRequest leg : request.legs()) {
             Account account = locked.get(leg.accountId());
             tx.addLeg(account, leg.direction(), leg.amount());
@@ -116,9 +117,17 @@ public class LedgerService {
             lines.add(new StatementResponse.Line(
                     leg.getTransaction().getOccurredAt(),
                     leg.getTransaction().getDescription(),
+                    leg.getTransaction().getCategory(),
                     leg.getDirection(), leg.getAmount(), running));
         }
         return new StatementResponse(accountId, from, to, opening, running, lines);
+    }
+
+    private static String normalizeCategory(String category) {
+        if (category == null || category.isBlank()) {
+            return null;
+        }
+        return category.trim();
     }
 
     private void validateBalanced(List<TransactionRequest.LegRequest> legs) {

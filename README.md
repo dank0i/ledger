@@ -53,7 +53,7 @@ on port 8080, so start the backend first.
 | GET    | /api/accounts                               | List accounts with cached balances                 |
 | GET    | /api/accounts/{id}/balance                  | Balance recomputed from legs                       |
 | GET    | /api/accounts/{id}/statement?from=&to=      | Legs in [from, to) with running balance (ISO 8601) |
-| POST   | /api/transactions                           | Post a transaction (2+ balanced legs)              |
+| POST   | /api/transactions                           | Post a transaction (2+ balanced legs, optional category) |
 | GET    | /api/transactions                           | List transactions with legs                        |
 | POST   | /api/imports/csv                            | Multipart CSV import (field name `file`)           |
 

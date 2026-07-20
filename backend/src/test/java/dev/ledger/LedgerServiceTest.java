@@ -91,6 +91,17 @@ class LedgerServiceTest {
     }
 
     @Test
+    void categoryIsPersistedAndBlankIsNormalizedToNull() {
+        var tagged = ledger.post(new TransactionRequest("Groceries", " Food ", null, null,
+                List.of(debit(checking, "20.00"), credit(salary, "20.00"))));
+        var blank = ledger.post(new TransactionRequest("Untagged", "   ", null, null,
+                List.of(debit(checking, "5.00"), credit(salary, "5.00"))));
+
+        assertThat(tagged.transaction().getCategory()).isEqualTo("Food");
+        assertThat(blank.transaction().getCategory()).isNull();
+    }
+
+    @Test
     void unknownAccountIsRejected() {
         var request = new TransactionRequest("Ghost account", null, null,
                 List.of(debit(checking, "5.00"),
