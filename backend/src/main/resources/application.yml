@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: ledger
+
+  # Default profile runs on in-memory H2 so the app starts with zero setup.
+  datasource:
+    url: jdbc:h2:mem:ledger;DB_CLOSE_DELAY=-1
+    username: sa
+    password: ""
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
+  h2:
+    console:
+      enabled: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: postgres
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ledger
+    username: ledger
+    password: ledger
+    driver-class-name: org.postgresql.Driver

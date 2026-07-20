@@ -1,0 +1,116 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  color: #1a1a2e;
+  background: #f7f7fb;
+}
+
+.app {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+h1 {
+  font-size: 1.5rem;
+}
+
+h2 {
+  font-size: 1.1rem;
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  align-items: start;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 0.4rem 0.5rem;
+  border-bottom: 1px solid #e0e0ea;
+}
+
+.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+tbody tr:hover {
+  background: #eef0f8;
+  cursor: pointer;
+}
+
+tr.selected {
+  background: #e3e7f7;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.stack label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+}
+
+.inline-form {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+input,
+select {
+  padding: 0.4rem 0.5rem;
+  border: 1px solid #c5c8d8;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+button {
+  padding: 0.45rem 1rem;
+  border: none;
+  border-radius: 4px;
+  background: #3b4a8f;
+  color: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+  align-self: start;
+}
+
+button:hover {
+  background: #2e3a73;
+}
+
+.error {
+  color: #b00020;
+  font-size: 0.85rem;
+}
+
+.ok {
+  color: #1a7f37;
+  font-size: 0.85rem;
+}
+
+.muted {
+  color: #777;
+}
