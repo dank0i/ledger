@@ -64,7 +64,10 @@ export default function Statement({ account }: Props) {
             {data.lines.map((line, i) => (
               <tr key={i}>
                 <td>{line.occurredAt.slice(0, 10)}</td>
-                <td>{line.description}</td>
+                <td>
+                  {line.description}
+                  {line.category && <span className="muted"> · {line.category}</span>}
+                </td>
                 <td className="num">
                   {line.direction === "DEBIT" ? "" : "-"}
                   {Number(line.amount).toFixed(2)}

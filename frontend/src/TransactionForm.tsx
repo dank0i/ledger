@@ -8,6 +8,7 @@ interface Props {
 
 export default function TransactionForm({ accounts, onPosted }: Props) {
   const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("");
   const [debitId, setDebitId] = useState("");
   const [creditId, setCreditId] = useState("");
   const [amount, setAmount] = useState("");
@@ -23,6 +24,7 @@ export default function TransactionForm({ accounts, onPosted }: Props) {
     try {
       const tx = await api.postTransaction({
         description: description.trim(),
+        category: category.trim() || undefined,
         legs: [
           { accountId: Number(debitId), direction: "DEBIT", amount },
           { accountId: Number(creditId), direction: "CREDIT", amount },
@@ -31,6 +33,7 @@ export default function TransactionForm({ accounts, onPosted }: Props) {
       setPosted(`Posted transaction #${tx.id}`);
       setError(null);
       setDescription("");
+      setCategory("");
       setAmount("");
       onPosted();
     } catch (err) {
@@ -47,6 +50,14 @@ export default function TransactionForm({ accounts, onPosted }: Props) {
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           required
+        />
+      </label>
+      <label>
+        Category (optional)
+        <input
+          value={category}
+          maxLength={50}
+          onChange={(e) => setCategory(e.target.value)}
         />
       </label>
       <label>

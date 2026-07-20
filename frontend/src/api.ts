@@ -20,6 +20,7 @@ export interface Leg {
 export interface Transaction {
   id: number;
   description: string;
+  category: string | null;
   occurredAt: string;
   idempotencyKey: string | null;
   legs: Leg[];
@@ -28,6 +29,7 @@ export interface Transaction {
 export interface StatementLine {
   occurredAt: string;
   description: string;
+  category: string | null;
   direction: Direction;
   amount: string;
   runningBalance: string;
@@ -76,6 +78,7 @@ export const api = {
   listTransactions: () => request<Transaction[]>("/api/transactions"),
   postTransaction: (body: {
     description: string;
+    category?: string;
     legs: { accountId: number; direction: Direction; amount: string }[];
   }) => postJson<Transaction>("/api/transactions", body),
   statement: (accountId: number, from: string, to: string) =>
