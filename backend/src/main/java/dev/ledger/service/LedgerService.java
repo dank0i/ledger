@@ -8,8 +8,10 @@ import dev.ledger.repo.LedgerTransactionRepository;
 import dev.ledger.repo.TransactionLegRepository;
 import dev.ledger.web.dto.StatementResponse;
 import dev.ledger.web.dto.TransactionRequest;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -20,7 +22,13 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * Method validation is on because postings do not only arrive through the web
+ * layer: the CSV importer builds requests in code and calls {@link #post}
+ * directly, which would otherwise skip every constraint on the DTO.
+ */
 @Service
+@Validated
 public class LedgerService {
 
     /** Result of a posting: the transaction plus whether it was newly created. */
@@ -62,7 +70,7 @@ public class LedgerService {
     }
 
     @Transactional
-    public PostResult post(TransactionRequest request) {
+    public PostResult post(@Valid TransactionRequest request) {
         // Replaying a known idempotency key returns the original posting so
         // clients can safely retry after a timeout without double-booking.
         if (request.idempotencyKey() != null) {

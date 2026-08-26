@@ -8,6 +8,7 @@ import dev.ledger.service.NotFoundException;
 import dev.ledger.service.UnbalancedTransactionException;
 import dev.ledger.web.dto.TransactionRequest;
 import dev.ledger.web.dto.TransactionRequest.LegRequest;
+import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -156,5 +157,17 @@ class LedgerServiceTest {
 
     private static LegRequest credit(Account account, String amount) {
         return new LegRequest(account.getId(), Direction.CREDIT, new BigDecimal(amount));
+    }
+
+    @Test
+    void serviceRejectsNonPositiveAmountsEvenWithoutTheWebLayer() {
+        // The CSV importer calls post() directly, so the DTO constraints have
+        // to hold here and not only on the controller.
+        var request = new TransactionRequest("refund", Instant.now(), null, List.of(
+                new LegRequest(checking.getId(), Direction.DEBIT, new BigDecimal("-25.00")),
+                new LegRequest(salary.getId(), Direction.CREDIT, new BigDecimal("-25.00"))));
+
+        assertThatThrownBy(() -> ledger.post(request))
+                .isInstanceOf(ConstraintViolationException.class);
     }
 }

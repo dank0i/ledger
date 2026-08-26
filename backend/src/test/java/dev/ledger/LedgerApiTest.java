@@ -7,10 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -106,6 +108,33 @@ class LedgerApiTest {
                         .contentType(MediaType.APPLICATION_JSON).content(body))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(firstId));
+    }
+
+    @Test
+    void csvRowWithNegativeAmountIsA400() throws Exception {
+        long debit = createAccount("Checking", "ASSET");
+        long credit = createAccount("Salary", "INCOME");
+
+        mvc.perform(multipart("/api/imports/csv").file(csv(
+                        "2026-07-01,refund,-2500.00,%d,%d\n".formatted(debit, credit))))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Validation failed"));
+    }
+
+    @Test
+    void csvRowWithOverlongDescriptionIsA400() throws Exception {
+        long debit = createAccount("Checking", "ASSET");
+        long credit = createAccount("Salary", "INCOME");
+
+        mvc.perform(multipart("/api/imports/csv").file(csv(
+                        "2026-07-01,%s,10.00,%d,%d\n".formatted("x".repeat(300), debit, credit))))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Validation failed"));
+    }
+
+    private static MockMultipartFile csv(String content) {
+        return new MockMultipartFile("file", "import.csv", "text/csv",
+                content.getBytes(java.nio.charset.StandardCharsets.UTF_8));
     }
 
     private long createAccount(String name, String type) throws Exception {

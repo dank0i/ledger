@@ -57,8 +57,12 @@ on port 8080, so start the backend first.
 | GET    | /api/transactions                           | List transactions with legs                        |
 | POST   | /api/imports/csv                            | Multipart CSV import (field name `file`)           |
 
-Error mapping: validation failures are 400, unknown resources are 404, and
-transactions that violate the double-entry invariant are 422.
+Error mapping: validation failures are 400, unknown resources are 404,
+transactions that violate the double-entry invariant are 422, and a write that
+loses a race against a concurrent one is 409 (retry it).
+
+Validation runs on the service, not only on the controller, because the CSV
+importer builds requests in code and posts them directly.
 
 CSV format for imports (header row optional):
 
@@ -66,6 +70,10 @@ CSV format for imports (header row optional):
 date,description,amount,debitAccountId,creditAccountId
 2026-07-01,July pay,2500.00,1,2
 ```
+
+Fields are split on commas with no quoting support, so a description containing
+a comma is rejected rather than silently mis-parsed. A bad row fails the whole
+file, since a partial import is worse than none.
 
 ## Design notes
 
@@ -84,6 +92,11 @@ instead of creating a duplicate, so a client can safely retry until it gets an
 answer. The CSV import builds its keys by hashing each raw row, which makes
 re-uploading the same file (or overlapping exports) a no-op rather than a
 double-booking.
+
+Two postings racing on the same key is the one case the lookup cannot catch:
+both miss the select, and the unique constraint decides the winner. The loser
+gets a 409 rather than a 500, and its retry finds the committed transaction and
+gets the ordinary 200 replay.
 
 **Reconciliation.** Each account keeps a `cachedBalance` that is updated inside
 the same database transaction as the posting, with the affected account rows
