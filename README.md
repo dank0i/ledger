@@ -4,6 +4,19 @@ A small double-entry transaction ledger: Spring Boot backend, React frontend.
 Every transaction is recorded as a set of legs (debits and credits) that must
 balance, so the books can never drift out of sync by construction.
 
+## Why I built it
+
+Backend interviews keep asking what happens when two requests hit the same row
+at the same moment, and I would rather have written the thing than talk about it
+in the abstract. Double-entry bookkeeping turned out to be a good excuse,
+because the invariant is simple enough to state in one line and unforgiving
+enough that getting concurrency wrong shows up as money appearing out of
+nowhere.
+
+Most of what is here is ordinary CRUD. The three parts I actually care about are
+in the design notes at the bottom: the balance invariant, idempotent posting,
+and what happens when two postings race for the same key.
+
 ## Running the backend
 
 Requires Java 21 and Maven. The default profile uses an in-memory H2 database,
